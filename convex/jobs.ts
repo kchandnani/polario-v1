@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getCurrentUser } from "./users";
+import { api } from "./_generated/api";
 
 // Create a new job
 export const create = mutation({
@@ -44,6 +45,12 @@ export const create = mutation({
     await ctx.db.patch(projectId, {
       status: "processing",
       updatedAt: Date.now(),
+    });
+
+    // Trigger FastAPI brochure generation
+    ctx.scheduler.runAfter(0, api.fastapi.generateBrochure, {
+      jobId,
+      projectId,
     });
 
     return jobId;

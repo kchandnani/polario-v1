@@ -3,7 +3,7 @@ Brochure rendering endpoints
 """
 
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import time
 
 from app.models.content import RenderRequest, RenderResponse
@@ -15,10 +15,13 @@ router = APIRouter()
 # Initialize render service
 render_service = RenderService()
 
+# Optional auth for local development
+security = HTTPBearer(auto_error=False)
+
 @router.post("/generate", response_model=RenderResponse)
 async def generate_brochure(
     request: RenderRequest,
-    auth: dict = Depends(verify_clerk_token)
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> RenderResponse:
     """
     Generate PDF and PNG brochure from content and assets
@@ -32,6 +35,9 @@ async def generate_brochure(
     """
     
     try:
+        # Verify auth (optional for local development)
+        auth = await verify_clerk_token(credentials)
+        
         start_time = time.time()
         
         # Generate brochure using render service

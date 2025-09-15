@@ -99,7 +99,9 @@ class AIService:
         5. Primary conversion goal and urgency factors
         6. Recommended messaging tone and style
 
-        Return ONLY a JSON object with this structure:
+        CRITICAL: Return ONLY a valid JSON object. No explanations, no markdown, no code blocks.
+        
+        Required JSON structure:
         {{
             "target_pain_points": ["pain1", "pain2", "pain3"],
             "unique_value_prop": "clear value proposition",
@@ -110,11 +112,25 @@ class AIService:
             "messaging_tone": "professional/friendly/bold",
             "key_differentiators": ["diff1", "diff2", "diff3"]
         }}
+        
+        Example for software company:
+        {{
+            "target_pain_points": ["manual processes", "time waste", "human errors"],
+            "unique_value_prop": "Automate your workflow in minutes, not months",
+            "emotional_drivers": ["efficiency", "growth", "peace_of_mind"],
+            "positioning_angle": "fastest implementation in the market",
+            "conversion_goal": "trial_signup",
+            "urgency_factors": ["competitive_advantage", "limited_time"],
+            "messaging_tone": "professional",
+            "key_differentiators": ["speed", "ease_of_use", "support"]
+        }}
         """
         
         try:
             response = await self._call_gemini(analysis_prompt)
-            return json.loads(response)
+            # Clean the response to ensure valid JSON
+            cleaned_response = self._clean_json_response(response)
+            return json.loads(cleaned_response)
         except Exception as e:
             print(f"Business analysis failed: {e}")
             return self._create_fallback_analysis(request, industry_data)
@@ -162,7 +178,9 @@ class AIService:
         - CTA label: ≤25 characters
         - CTA sub: ≤50 characters (optional)
 
-        Return ONLY a JSON object with this exact structure:
+        CRITICAL: Return ONLY a valid JSON object. No explanations, no markdown, no code blocks.
+        
+        Required JSON structure:
         {{
             "headline": "benefit-focused headline",
             "subheadline": "value prop clarification",
@@ -185,20 +203,59 @@ class AIService:
                 "sub": "Urgency/value element"
             }}
         }}
+        
+        Example for accounting software:
+        {{
+            "headline": "Streamline Your Books, Grow Your Business",
+            "subheadline": "Professional accounting software designed for small business owners who want growth",
+            "bullets": [
+                {{
+                    "title": "Automated Bookkeeping",
+                    "desc": "Import transactions and categorize expenses automatically - saving 10+ hours per week"
+                }},
+                {{
+                    "title": "Tax-Ready Reports",
+                    "desc": "Built-in compliance tools ensure your books are always audit-ready with one-click reporting"
+                }},
+                {{
+                    "title": "Real-Time Insights",
+                    "desc": "Live dashboard shows cash flow and profit margins so you can make informed decisions"
+                }}
+            ],
+            "cta": {{
+                "label": "Start Your Free Trial",
+                "sub": "No credit card required"
+            }}
+        }}
         """
         
         try:
             response = await self._call_gemini(copywriting_prompt)
-            copy_json = json.loads(response)
+            # Clean the response to ensure valid JSON
+            cleaned_response = self._clean_json_response(response)
+            copy_json = json.loads(cleaned_response)
+            
+            from app.models.content import BulletPoint, CallToAction
+            
+            # Create bullet points
+            bullets = [
+                BulletPoint(title=bullet["title"], desc=bullet["desc"])
+                for bullet in copy_json["bullets"]
+            ]
+            
+            # Create CTA if present
+            cta = None
+            if copy_json.get("cta"):
+                cta = CallToAction(
+                    label=copy_json["cta"]["label"],
+                    sub=copy_json["cta"].get("sub")
+                )
             
             return CopyData(
                 headline=copy_json["headline"],
                 subheadline=copy_json.get("subheadline"),
-                bullets=[
-                    {"title": bullet["title"], "desc": bullet["desc"]}
-                    for bullet in copy_json["bullets"]
-                ],
-                cta=copy_json.get("cta")
+                bullets=bullets,
+                cta=cta
             )
             
         except Exception as e:
@@ -222,28 +279,51 @@ class AIService:
             copy_data.bullets = copy_data.bullets[:3]
         elif len(copy_data.bullets) < 3:
             # Pad with generic bullets if needed
+            from app.models.content import BulletPoint
             while len(copy_data.bullets) < 3:
-                copy_data.bullets.append({
-                    "title": "Additional Value",
-                    "desc": "More benefits and features designed specifically for your needs"
-                })
+                copy_data.bullets.append(BulletPoint(
+                    title="Additional Value",
+                    desc="More benefits and features designed specifically for your needs"
+                ))
         
         # Validate bullet constraints
         for bullet in copy_data.bullets:
-            if len(bullet["title"]) > 28:
-                bullet["title"] = bullet["title"][:25] + "..."
-            if len(bullet["desc"]) > 120:
-                bullet["desc"] = bullet["desc"][:117] + "..."
+            if len(bullet.title) > 28:
+                bullet.title = bullet.title[:25] + "..."
+            if len(bullet.desc) > 120:
+                bullet.desc = bullet.desc[:117] + "..."
         
         # Validate CTA constraints
         if copy_data.cta:
-            if len(copy_data.cta["label"]) > 25:
-                copy_data.cta["label"] = copy_data.cta["label"][:22] + "..."
-            if copy_data.cta.get("sub") and len(copy_data.cta["sub"]) > 50:
-                copy_data.cta["sub"] = copy_data.cta["sub"][:47] + "..."
+            if len(copy_data.cta.label) > 25:
+                copy_data.cta.label = copy_data.cta.label[:22] + "..."
+            if copy_data.cta.sub and len(copy_data.cta.sub) > 50:
+                copy_data.cta.sub = copy_data.cta.sub[:47] + "..."
         
         return copy_data
     
+    def _clean_json_response(self, response: str) -> str:
+        """Clean AI response to ensure valid JSON"""
+        # Remove common AI response prefixes/suffixes
+        response = response.strip()
+        
+        # Remove markdown code blocks if present
+        if response.startswith("```json"):
+            response = response[7:]
+        if response.startswith("```"):
+            response = response[3:]
+        if response.endswith("```"):
+            response = response[:-3]
+        
+        # Find JSON object boundaries
+        start = response.find('{')
+        end = response.rfind('}') + 1
+        
+        if start != -1 and end > start:
+            response = response[start:end]
+        
+        return response.strip()
+
     async def _call_gemini(self, prompt: str) -> str:
         """Call Gemini API with retry logic"""
         
@@ -283,6 +363,8 @@ class AIService:
     
     def _create_fallback_content(self, request: ContentRequest) -> CopyData:
         """Create safe fallback content if AI completely fails"""
+        from app.models.content import BulletPoint, CallToAction
+        
         business_name = request.business_info.name
         business_type = request.business_info.type
         
@@ -290,23 +372,23 @@ class AIService:
             headline=f"Professional {business_type} Solutions",
             subheadline=f"Trusted by businesses like yours to deliver exceptional results",
             bullets=[
-                {
-                    "title": "Quality Service",
-                    "desc": f"Professional {business_type.lower()} solutions tailored to your specific needs"
-                },
-                {
-                    "title": "Proven Results", 
-                    "desc": "Track record of success helping businesses achieve their goals"
-                },
-                {
-                    "title": "Expert Support",
-                    "desc": "Dedicated team ready to help you succeed every step of the way"
-                }
+                BulletPoint(
+                    title="Quality Service",
+                    desc=f"Professional {business_type.lower()} solutions tailored to your specific needs"
+                ),
+                BulletPoint(
+                    title="Proven Results", 
+                    desc="Track record of success helping businesses achieve their goals"
+                ),
+                BulletPoint(
+                    title="Expert Support",
+                    desc="Dedicated team ready to help you succeed every step of the way"
+                )
             ],
-            cta={
-                "label": "Get Started Today",
-                "sub": "Contact us for a free consultation"
-            }
+            cta=CallToAction(
+                label="Get Started Today",
+                sub="Contact us for a free consultation"
+            )
         )
     
     def _create_fallback_copy_data(self, request: ContentRequest) -> CopyData:

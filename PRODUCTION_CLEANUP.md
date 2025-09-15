@@ -33,7 +33,7 @@ export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
   if (!identity) {
 -   // For local development without JWT, return null but don't error
 -   // In production, you'd want to throw an error here
--   return null;
+-   return null;e end
 +   throw new Error("Not authenticated");
   }
   // ... rest stays the same

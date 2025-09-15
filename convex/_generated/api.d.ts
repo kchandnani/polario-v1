@@ -14,9 +14,11 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as assets from "../assets.js";
+import type * as fastapi from "../fastapi.js";
 import type * as jobSimulator from "../jobSimulator.js";
 import type * as jobs from "../jobs.js";
 import type * as projects from "../projects.js";
+import type * as renders from "../renders.js";
 import type * as users from "../users.js";
 
 /**
@@ -29,9 +31,11 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   assets: typeof assets;
+  fastapi: typeof fastapi;
   jobSimulator: typeof jobSimulator;
   jobs: typeof jobs;
   projects: typeof projects;
+  renders: typeof renders;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

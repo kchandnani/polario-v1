@@ -80,11 +80,20 @@ export const getUserProjects = query({
 
 // Get a specific project by ID
 export const getById = query({
-  args: { projectId: v.id("projects") },
-  handler: async (ctx, { projectId }) => {
-    const user = await getCurrentUser(ctx);
-    if (!user) {
-      throw new Error("Not authenticated");
+  args: { 
+    projectId: v.id("projects"),
+    includeAssets: v.optional(v.boolean()),
+    clerkId: v.optional(v.string()), // For local development
+  },
+  handler: async (ctx, { projectId, includeAssets = false, clerkId }) => {
+    let user = await getCurrentUser(ctx);
+    
+    // For local development without JWT auth
+    if (!user && clerkId) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+        .first();
     }
 
     const project = await ctx.db.get(projectId);
@@ -92,9 +101,22 @@ export const getById = query({
       throw new Error("Project not found");
     }
 
-    // Check if user owns this project
-    if (project.userId !== user._id) {
+    // Check if user owns this project (skip for local development if no user)
+    if (user && project.userId !== user._id) {
       throw new Error("Not authorized to view this project");
+    }
+
+    if (includeAssets) {
+      // Get project assets
+      const assets = await ctx.db
+        .query("assets")
+        .withIndex("by_projectId", (q) => q.eq("projectId", projectId))
+        .collect();
+      
+      return {
+        ...project,
+        assets,
+      };
     }
 
     return project;

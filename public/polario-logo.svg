@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="32" viewBox="0 0 120 32" role="img" aria-label="Polario logo">
+  <!-- Icon: Stylized "P" with modern geometric design -->
+  <g transform="translate(0,4)">
+    <!-- Main circle background -->
+    <circle cx="16" cy="12" r="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Stylized "P" shape -->
+    <path d="M8 6 L8 18 L20 18 L20 14 L12 14 L12 6 Z" fill="currentColor"/>
+    <!-- Accent dot -->
+    <circle cx="22" cy="8" r="2" fill="currentColor"/>
+  </g>
+  
+  <!-- Text: "Polario" -->
+  <text x="40" y="20" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" 
+        font-size="16" font-weight="700" fill="currentColor" letter-spacing="0.5">Polario</text>
+</svg>

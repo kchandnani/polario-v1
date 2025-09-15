@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="Polario icon">
+  <!-- Icon: Stylized "P" with modern geometric design -->
+  <g transform="translate(4,4)">
+    <!-- Main circle background -->
+    <circle cx="12" cy="12" r="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Stylized "P" shape -->
+    <path d="M4 6 L4 18 L16 18 L16 14 L8 14 L8 6 Z" fill="currentColor"/>
+    <!-- Accent dot -->
+    <circle cx="18" cy="8" r="2" fill="currentColor"/>
+  </g>
+</svg>

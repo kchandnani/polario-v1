@@ -79,8 +79,8 @@ export default defineSchema({
     jobId: v.id("jobs"),
     projectId: v.id("projects"),
     userId: v.id("users"), // Simplified for MVP
-    pdfStorageId: v.id("_storage"),
-    pngStorageId: v.optional(v.id("_storage")),
+    pdfUrl: v.string(), // External URL from HTMLCSStoImage
+    pngUrl: v.optional(v.string()), // External URL from HTMLCSStoImage
     copyData: v.object({
       headline: v.string(),
       subheadline: v.optional(v.string()),

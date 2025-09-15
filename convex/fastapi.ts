@@ -13,7 +13,7 @@ export const generateBrochure = action({
     jobId: v.id("jobs"),
     projectId: v.id("projects"),
   },
-  handler: async (ctx, { jobId, projectId }) => {
+  handler: async (ctx, { jobId, projectId }): Promise<any> => {
     try {
       // Update job status to running
       await ctx.runMutation(api.jobs.updateStatus, {
@@ -42,11 +42,21 @@ export const generateBrochure = action({
       // Prepare asset URLs
       const assetUrls: Record<string, string> = {};
       for (const asset of assets) {
-        if (asset.type === "logo" || asset.type === "hero") {
+        if (asset.isLogo) {
           const url = await ctx.runQuery(api.assets.getAssetUrl, { 
             storageId: asset.storageId 
           });
-          assetUrls[asset.type] = url;
+          if (url) {
+            assetUrls["logo"] = url;
+          }
+        } else {
+          // Non-logo assets are treated as hero images
+          const url = await ctx.runQuery(api.assets.getAssetUrl, { 
+            storageId: asset.storageId 
+          });
+          if (url) {
+            assetUrls["hero"] = url;
+          }
         }
       }
 
@@ -83,7 +93,7 @@ export const generateBrochure = action({
       });
 
       // Step 3: Store render results in Convex
-      const renderId = await ctx.runMutation(api.renders.create, {
+      const renderData: any = {
         jobId,
         projectId,
         copyData: aiResponse.copy_data,
@@ -92,8 +102,14 @@ export const generateBrochure = action({
           palette: { primary: "#2563eb" }
         },
         pdfUrl: renderResponse?.pdf_url || "pending",
-        pngUrl: renderResponse?.png_url || null,
-      });
+      };
+      
+      // Only include pngUrl if it exists (Convex optional fields need undefined, not null)
+      if (renderResponse?.png_url) {
+        renderData.pngUrl = renderResponse.png_url;
+      }
+      
+      const renderId: any = await ctx.runMutation(api.renders.create, renderData);
 
       // Update job as completed
       await ctx.runMutation(api.jobs.updateStatus, {

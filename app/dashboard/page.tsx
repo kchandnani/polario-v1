@@ -125,7 +125,7 @@ export default function DashboardPage() {
                       <CheckCircle className="w-6 h-6 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-3xl font-bold">{projects.filter((p) => p.status === "completed").length}</p>
+                      <p className="text-3xl font-bold">{projects.filter((p: any) => p.status === "completed").length}</p>
                       <p className="text-sm text-muted-foreground">Completed</p>
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
                       <TrendingUp className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-3xl font-bold">{projects.filter((p) => p.status === "processing").length}</p>
+                      <p className="text-3xl font-bold">{projects.filter((p: any) => p.status === "processing").length}</p>
                       <p className="text-sm text-muted-foreground">In Progress</p>
                     </div>
                   </div>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
             {/* Projects Grid */}
             {projects.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {projects.map((project) => (
+                {projects.map((project: any) => (
                   <Card key={project._id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg">
                     <CardHeader className="pb-4">
                       <div className="flex items-start justify-between">

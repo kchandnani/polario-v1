@@ -6,6 +6,8 @@ import { UserJSON } from "@clerk/backend";
 export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
+    // For local development without JWT, return null but don't error
+    // In production, you'd want to throw an error here
     return null;
   }
 
@@ -65,6 +67,25 @@ export const getCurrentUserProfile = query({
     }
 
     return user;
+  },
+});
+
+// Debug query to list all users (temporary for testing)
+export const getAllUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("users").collect();
+  },
+});
+
+// Get user by Clerk ID (for testing without auth)
+export const getUserByClerkId = query({
+  args: { clerkId: v.string() },
+  handler: async (ctx, { clerkId }) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+      .first();
   },
 });
 

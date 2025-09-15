@@ -17,11 +17,21 @@ export const create = mutation({
         desc: v.string(),
       })
     ),
+    clerkId: v.optional(v.string()), // For local development
   },
-  handler: async (ctx, { title, businessInfo, features }) => {
-    const user = await getCurrentUser(ctx);
+  handler: async (ctx, { title, businessInfo, features, clerkId }) => {
+    let user = await getCurrentUser(ctx);
+    
+    // For local development without JWT auth
+    if (!user && clerkId) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+        .first();
+    }
+    
     if (!user) {
-      throw new Error("Not authenticated");
+      throw new Error("Not authenticated - user not found");
     }
 
     const projectId = await ctx.db.insert("projects", {
@@ -40,9 +50,20 @@ export const create = mutation({
 
 // Get user's projects
 export const getUserProjects = query({
-  args: {},
-  handler: async (ctx) => {
-    const user = await getCurrentUser(ctx);
+  args: {
+    clerkId: v.optional(v.string()), // For local development
+  },
+  handler: async (ctx, { clerkId }) => {
+    let user = await getCurrentUser(ctx);
+    
+    // For local development without JWT auth
+    if (!user && clerkId) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+        .first();
+    }
+    
     if (!user) {
       return [];
     }

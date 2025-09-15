@@ -1,7 +1,10 @@
 "use client"
 
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useUser } from "@clerk/nextjs"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -9,18 +12,27 @@ import { Container } from "@/components/container"
 import { JobProgress } from "@/components/job-progress"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Clock, AlertCircle, ArrowLeft } from "lucide-react"
-import { apiClient } from "@/lib/client"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 
 interface JobPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default function JobPage({ params }: JobPageProps) {
   const router = useRouter()
   const { toast } = useToast()
-  const { data: job, error, isLoading } = apiClient.getJob(params.id)
+  const { user } = useUser()
+  
+  // Use React.use() for Next.js 15 params
+  const { id: jobId } = React.use(params)
+  
+  const job = useQuery(api.jobs.getById, 
+    user ? { jobId: jobId as any, clerkId: user.id } : "skip"
+  )
+  
+  const isLoading = job === undefined
+  const error = job === null
 
   useEffect(() => {
     if (job?.status === "done" && job.resultId) {
@@ -164,7 +176,7 @@ export default function JobPage({ params }: JobPageProps) {
 
               <JobProgress status={job.status} progress={job.progress} />
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap">
                 <Button variant="outline" asChild>
                   <Link href="/dashboard">
                     <ArrowLeft className="w-4 h-4 mr-2" />
@@ -183,6 +195,7 @@ export default function JobPage({ params }: JobPageProps) {
                     <Link href="/create">Try Again</Link>
                   </Button>
                 )}
+                
               </div>
             </CardContent>
           </Card>
@@ -195,7 +208,7 @@ export default function JobPage({ params }: JobPageProps) {
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Job ID:</span>
-                <span className="font-mono text-sm">{job.id}</span>
+                <span className="font-mono text-sm">{job._id}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Started:</span>

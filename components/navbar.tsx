@@ -3,13 +3,15 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useUser, SignInButton, UserButton } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { Container } from "@/components/container"
 import { cn } from "@/lib/utils"
-import { Menu, X } from "lucide-react"
+import { Menu, X, User } from "lucide-react"
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { user, isLoaded } = useUser()
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -63,12 +65,32 @@ export function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" asChild>
-              <Link href="/auth">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/waitlist">Get Started</Link>
-            </Button>
+            {!isLoaded ? (
+              <div className="w-8 h-8 animate-pulse bg-muted rounded-full" />
+            ) : user ? (
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-muted-foreground">
+                  {user.firstName || user.emailAddresses[0]?.emailAddress}
+                </span>
+                <UserButton 
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8"
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <>
+                <SignInButton mode="modal">
+                  <Button variant="ghost">Sign In</Button>
+                </SignInButton>
+                <Button asChild>
+                  <Link href="/waitlist">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -109,16 +131,34 @@ export function Navbar() {
                 </Link>
               </nav>
               <div className="px-4 space-y-2">
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                  <Link href="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                    Sign In
-                  </Link>
-                </Button>
-                <Button className="w-full justify-start" asChild>
-                  <Link href="/waitlist" onClick={() => setIsMobileMenuOpen(false)}>
-                    Get Started
-                  </Link>
-                </Button>
+                {user ? (
+                  <div className="flex items-center justify-between p-2">
+                    <span className="text-sm text-muted-foreground">
+                      {user.firstName || user.emailAddresses[0]?.emailAddress}
+                    </span>
+                    <UserButton 
+                      afterSignOutUrl="/"
+                      appearance={{
+                        elements: {
+                          avatarBox: "w-8 h-8"
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <SignInButton mode="modal">
+                      <Button variant="ghost" className="w-full justify-start">
+                        Sign In
+                      </Button>
+                    </SignInButton>
+                    <Button className="w-full justify-start" asChild>
+                      <Link href="/waitlist" onClick={() => setIsMobileMenuOpen(false)}>
+                        Get Started
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>

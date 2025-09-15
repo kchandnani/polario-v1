@@ -7,11 +7,21 @@ export const create = mutation({
   args: {
     projectId: v.id("projects"),
     type: v.literal("generate"),
+    clerkId: v.optional(v.string()), // For local development
   },
-  handler: async (ctx, { projectId, type }) => {
-    const user = await getCurrentUser(ctx);
+  handler: async (ctx, { projectId, type, clerkId }) => {
+    let user = await getCurrentUser(ctx);
+    
+    // For local development without JWT auth
+    if (!user && clerkId) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+        .first();
+    }
+    
     if (!user) {
-      throw new Error("Not authenticated");
+      throw new Error("Not authenticated - user not found");
     }
 
     // Verify the project belongs to the user
@@ -42,11 +52,19 @@ export const create = mutation({
 
 // Get job by ID
 export const getById = query({
-  args: { jobId: v.id("jobs") },
-  handler: async (ctx, { jobId }) => {
-    const user = await getCurrentUser(ctx);
-    if (!user) {
-      throw new Error("Not authenticated");
+  args: { 
+    jobId: v.id("jobs"),
+    clerkId: v.optional(v.string()), // For local development
+  },
+  handler: async (ctx, { jobId, clerkId }) => {
+    let user = await getCurrentUser(ctx);
+    
+    // For local development without JWT auth
+    if (!user && clerkId) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+        .first();
     }
 
     const job = await ctx.db.get(jobId);
@@ -54,8 +72,8 @@ export const getById = query({
       throw new Error("Job not found");
     }
 
-    // Check if user owns this job
-    if (job.userId !== user._id) {
+    // Check if user owns this job (skip for local development if no user)
+    if (user && job.userId !== user._id) {
       throw new Error("Not authorized to view this job");
     }
 

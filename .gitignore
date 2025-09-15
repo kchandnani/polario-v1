@@ -119,3 +119,104 @@ jspm_packages/
 
 # stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+# Development and production safety
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Database files (if any local DBs are used)
+*.sqlite
+*.sqlite3
+*.db
+
+# Configuration files that might contain secrets
+config.json
+secrets.json
+.secrets
+
+# Docker files (if used later)
+.dockerignore
+Dockerfile.local
+
+# Package manager locks (keep pnpm-lock.yaml but ignore others if switching)
+package-lock.json.bak
+yarn.lock.bak
+
+# FastAPI specific (for Phase 3)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments (Python)
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local development certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Temporary upload directories
+uploads/
+temp-uploads/
+
+# Generated documentation
+docs/_build/
+
+# FastAPI Backend specific
+backend/.env
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/**/*.pyc
+backend/test_request.json
+backend/temp/
+backend/logs/
+
+# AI/ML models and cache
+backend/models/
+backend/.cache/
+backend/tmp/
+
+# Playwright browsers and cache
+backend/.playwright/
+ms-playwright/
+
+# PDF generation temp files
+backend/temp_renders/
+backend/output/

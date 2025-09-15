@@ -9,11 +9,45 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Container } from "@/components/container"
 import { EmptyState } from "@/components/empty-state"
+import { SignInButton } from "@clerk/nextjs"
 import { Plus, FileText, Calendar, MoreHorizontal, TrendingUp, CheckCircle, Clock } from "lucide-react"
 
 export default function DashboardPage() {
-  const { user } = useUser()
-  const projects = useQuery(api.projects.getUserProjects) || []
+  const { user, isLoaded } = useUser()
+
+  // Show loading while Clerk is initializing
+  if (!isLoaded) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    )
+  }
+
+  // Redirect to auth if not signed in
+  if (!user) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center py-20">
+        <Container>
+          <div className="max-w-md mx-auto text-center space-y-6">
+            <h1 className="text-2xl font-bold">Sign In Required</h1>
+            <p className="text-muted-foreground">
+              You need to be signed in to access your dashboard
+            </p>
+            <SignInButton mode="modal">
+              <Button size="lg">
+                Sign In to Continue
+              </Button>
+            </SignInButton>
+          </div>
+        </Container>
+      </div>
+    )
+  }
+
+  const projects = useQuery(api.projects.getUserProjects, 
+    user ? { clerkId: user.id } : "skip"
+  ) || []
 
   const getStatusColor = (status: "draft" | "processing" | "completed" | "error") => {
     switch (status) {
@@ -125,7 +159,7 @@ export default function DashboardPage() {
             {projects.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {projects.map((project) => (
-                  <Card key={project.id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg">
+                  <Card key={project._id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg">
                     <CardHeader className="pb-4">
                       <div className="flex items-start justify-between">
                       <div className="space-y-2 flex-1 min-w-0">

@@ -1,6 +1,10 @@
 {
   "name": "polario",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "AI-powered professional brochure generator with industry-specific copywriting intelligence",
+  "keywords": ["ai", "brochure", "marketing", "pdf", "copywriting", "nextjs", "fastapi"],
+  "author": "Karan Chandnani",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build": "next build",
@@ -59,7 +63,7 @@
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
     "sonner": "^1.7.4",
-    "swr": "latest",
+    "svix": "^1.76.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",

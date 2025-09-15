@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ copy.headline }} - Professional Brochure</title>
+    <style>
+        {% include 'base.css' %}
+    </style>
+</head>
+<body>
+    <div class="brochure-container">
+        <!-- Logo -->
+        {% if assets.logo %}
+        <img src="{{ assets.logo }}" alt="Company Logo" class="logo">
+        {% endif %}
+        
+        <!-- Hero Section -->
+        <section class="section section-hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-headline">{{ copy.headline }}</h1>
+                    {% if copy.subheadline %}
+                    <p class="hero-subheadline">{{ copy.subheadline }}</p>
+                    {% endif %}
+                    
+                    {% if assets.hero %}
+                    <img src="{{ assets.hero }}" alt="Hero Image" class="hero-image">
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="section section-features">
+            <div class="container">
+                <div class="features-grid">
+                    {% for bullet in copy.bullets %}
+                    <div class="feature-card">
+                        <div class="feature-icon">{{ loop.index }}</div>
+                        <h3 class="feature-title">{{ bullet.title }}</h3>
+                        <p class="feature-description">{{ bullet.desc }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        
+        <!-- Call to Action Section -->
+        {% if copy.cta %}
+        <section class="section section-cta">
+            <div class="container">
+                <div class="cta-content">
+                    <a href="#" class="cta-button">{{ copy.cta.label }}</a>
+                    {% if copy.cta.sub %}
+                    <p class="cta-subtitle">{{ copy.cta.sub }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+</body>
+</html>

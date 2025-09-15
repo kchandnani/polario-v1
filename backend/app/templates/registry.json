@@ -1,0 +1,42 @@
+{
+  "templates": {
+    "product_a": {
+      "name": "Product A",
+      "description": "Hero + 3 Features + CTA layout - Perfect for product launches and service promotions",
+      "preview_image": "product_a_preview.png",
+      "constraints": {
+        "headline_max": 90,
+        "subheadline_max": 140,
+        "bullet_title_max": 28,
+        "bullet_desc_max": 120,
+        "bullets_count": 3,
+        "hero_aspect_ratio": "16:9",
+        "logo_max_width": 160,
+        "logo_max_height": 64
+      },
+      "features": [
+        "Large hero image section",
+        "Prominent headline and subheadline",
+        "Three feature highlight cards",
+        "Strong call-to-action section",
+        "Logo placement in top-left",
+        "Print-optimized A4 layout"
+      ],
+      "best_for": [
+        "Product launches",
+        "Service promotions", 
+        "Professional services",
+        "Software/SaaS companies",
+        "Consulting firms"
+      ]
+    }
+  },
+  "default": "product_a",
+  "global_constraints": {
+    "max_file_size": "15MB",
+    "supported_image_formats": ["JPEG", "PNG", "WEBP", "SVG"],
+    "output_formats": ["PDF", "PNG"],
+    "page_size": "A4",
+    "print_ready": true
+  }
+}

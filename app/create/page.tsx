@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useUser } from "@clerk/nextjs"
 import { useMutation } from "convex/react"
+import { SignInButton } from "@clerk/nextjs"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,17 +14,50 @@ import { Textarea } from "@/components/ui/textarea"
 import { Container } from "@/components/container"
 import { FileDropzone } from "@/components/file-dropzone"
 import { useToast } from "@/hooks/use-toast"
-import { Upload, FileText, Sparkles } from "lucide-react"
+import { Upload, FileText, Sparkles, Loader2 } from "lucide-react"
+import type { Id } from "@/convex/_generated/dataModel"
 
 export default function CreatePage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { user } = useUser()
+  const { user, isLoaded } = useUser()
   const [isGenerating, setIsGenerating] = useState(false)
+
+  // Show loading while Clerk is initializing
+  if (!isLoaded) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    )
+  }
+
+  // Redirect to auth if not signed in
+  if (!user) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center py-20">
+        <Container>
+          <div className="max-w-md mx-auto text-center space-y-6">
+            <h1 className="text-2xl font-bold">Sign In Required</h1>
+            <p className="text-muted-foreground">
+              You need to be signed in to create brochures
+            </p>
+            <SignInButton mode="modal">
+              <Button size="lg">
+                Sign In to Continue
+              </Button>
+            </SignInButton>
+          </div>
+        </Container>
+      </div>
+    )
+  }
 
   // Convex mutations
   const createProject = useMutation(api.projects.create)
   const createJob = useMutation(api.jobs.create)
+  const generateUploadUrl = useMutation(api.assets.generateUploadUrl)
+  const createAsset = useMutation(api.assets.createAsset)
 
   const [businessName, setBusinessName] = useState("")
   const [businessType, setBusinessType] = useState("")
@@ -36,17 +70,85 @@ export default function CreatePage() {
   const [feature3Desc, setFeature3Desc] = useState("")
   const [logo, setLogo] = useState<File | undefined>()
   const [heroImage, setHeroImage] = useState<File | undefined>()
+  const [logoStorageId, setLogoStorageId] = useState<Id<"_storage"> | undefined>()
+  const [heroStorageId, setHeroStorageId] = useState<Id<"_storage"> | undefined>()
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [uploadingHero, setUploadingHero] = useState(false)
 
-  const handleLogoChange = (files: File[]) => {
-    if (files.length > 0) {
-      setLogo(files[0])
+  // File upload handlers
+  const uploadFile = async (file: File, projectId: Id<"projects">, isLogo: boolean) => {
+    try {
+      // Get upload URL
+      const uploadUrl = await generateUploadUrl()
+      
+      // Upload file to Convex storage
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      })
+      
+      const { storageId } = await result.json()
+      
+      // Get image dimensions if it's an image
+      let width: number | undefined
+      let height: number | undefined
+      
+      if (file.type.startsWith('image/')) {
+        const img = new Image()
+        await new Promise((resolve, reject) => {
+          img.onload = resolve
+          img.onerror = reject
+          img.src = URL.createObjectURL(file)
+        })
+        width = img.width
+        height = img.height
+        URL.revokeObjectURL(img.src)
+      }
+      
+      // Create asset record in Convex
+      await createAsset({
+        projectId,
+        storageId,
+        mimeType: file.type,
+        size: file.size,
+        width,
+        height,
+        isLogo,
+      })
+      
+      return storageId
+    } catch (error) {
+      console.error('File upload failed:', error)
+      toast({
+        title: "Upload failed",
+        description: `Failed to upload ${isLogo ? 'logo' : 'hero image'}. Please try again.`,
+        variant: "destructive",
+      })
+      throw error
     }
   }
 
-  const handleHeroChange = (files: File[]) => {
-    if (files.length > 0) {
-      setHeroImage(files[0])
+  const handleLogoChange = async (file: File | undefined) => {
+    if (!file) {
+      setLogo(undefined)
+      setLogoStorageId(undefined)
+      return
     }
+    
+    setLogo(file)
+    // We'll upload when the project is created
+  }
+
+  const handleHeroChange = async (file: File | undefined) => {
+    if (!file) {
+      setHeroImage(undefined)
+      setHeroStorageId(undefined)
+      return
+    }
+    
+    setHeroImage(file)
+    // We'll upload when the project is created
   }
 
   const validateForm = (): boolean => {
@@ -98,12 +200,46 @@ export default function CreatePage() {
           { title: feature2Title, desc: feature2Desc },
           { title: feature3Title, desc: feature3Desc },
         ],
+        clerkId: user.id, // Pass Clerk ID for local development
       })
+
+      // Upload files if they exist
+      const uploadPromises: Promise<any>[] = []
+      
+      if (logo) {
+        setUploadingLogo(true)
+        uploadPromises.push(
+          uploadFile(logo, projectId, true).then(storageId => {
+            setLogoStorageId(storageId)
+            setUploadingLogo(false)
+          }).catch(() => setUploadingLogo(false))
+        )
+      }
+      
+      if (heroImage) {
+        setUploadingHero(true)
+        uploadPromises.push(
+          uploadFile(heroImage, projectId, false).then(storageId => {
+            setHeroStorageId(storageId)
+            setUploadingHero(false)
+          }).catch(() => setUploadingHero(false))
+        )
+      }
+      
+      // Wait for all uploads to complete
+      if (uploadPromises.length > 0) {
+        await Promise.all(uploadPromises)
+        toast({
+          title: "Files uploaded successfully!",
+          description: "Your assets have been uploaded and processed.",
+        })
+      }
 
       // Create a job for this project
       const jobId = await createJob({
         projectId,
         type: "generate",
+        clerkId: user.id, // Pass Clerk ID for local development
       })
 
       toast({
@@ -119,6 +255,8 @@ export default function CreatePage() {
         description: "There was an error starting the brochure generation. Please try again.",
         variant: "destructive",
       })
+      setUploadingLogo(false)
+      setUploadingHero(false)
     } finally {
       setIsGenerating(false)
     }
@@ -297,60 +435,44 @@ export default function CreatePage() {
 
               {/* Logo Upload */}
               <div className="space-y-3">
-                <Label className="text-base font-medium">Logo (Optional)</Label>
-                <FileDropzone
-                  onFilesChange={handleLogoChange}
-                  accept={{ "image/*": [".png", ".jpg", ".jpeg", ".svg"] }}
-                  maxFiles={1}
-                  className="h-32 border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors"
-                >
-                  {logo ? (
-                    <div className="text-center space-y-2">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg mx-auto flex items-center justify-center">
-                        <FileText className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="font-medium text-sm">{logo.name}</p>
-                      <p className="text-xs text-muted-foreground">Logo uploaded successfully</p>
-                    </div>
-                  ) : (
-                    <div className="text-center space-y-2">
-                      <div className="w-12 h-12 bg-muted rounded-lg mx-auto flex items-center justify-center">
-                        <Upload className="w-6 h-6 text-muted-foreground" />
-                      </div>
-                      <p className="font-medium text-sm">Drop your logo here</p>
-                      <p className="text-xs text-muted-foreground">PNG, JPG, or SVG</p>
-                    </div>
+                <Label className="text-base font-medium">
+                  Logo (Optional)
+                  {uploadingLogo && (
+                    <span className="ml-2 inline-flex items-center">
+                      <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                      Uploading...
+                    </span>
                   )}
-                </FileDropzone>
+                </Label>
+                <FileDropzone
+                  accept="image/*"
+                  maxSize={15 * 1024 * 1024} // 15MB
+                  onFileChange={handleLogoChange}
+                  currentFile={logo}
+                  placeholder="Drop your logo here or click to browse"
+                />
+                <p className="text-xs text-muted-foreground">Recommended: Square format, PNG, JPG, or SVG, max 15MB</p>
               </div>
 
               {/* Hero Image Upload */}
               <div className="space-y-3">
-                <Label className="text-base font-medium">Hero Image (Optional)</Label>
-                <FileDropzone
-                  onFilesChange={handleHeroChange}
-                  accept={{ "image/*": [".png", ".jpg", ".jpeg"] }}
-                  maxFiles={1}
-                  className="h-32 border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors"
-                >
-                  {heroImage ? (
-                    <div className="text-center space-y-2">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg mx-auto flex items-center justify-center">
-                        <FileText className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="font-medium text-sm">{heroImage.name}</p>
-                      <p className="text-xs text-muted-foreground">Hero image uploaded successfully</p>
-                    </div>
-                  ) : (
-                    <div className="text-center space-y-2">
-                      <div className="w-12 h-12 bg-muted rounded-lg mx-auto flex items-center justify-center">
-                        <Upload className="w-6 h-6 text-muted-foreground" />
-                      </div>
-                      <p className="font-medium text-sm">Drop your hero image here</p>
-                      <p className="text-xs text-muted-foreground">PNG or JPG</p>
-                    </div>
+                <Label className="text-base font-medium">
+                  Hero Image (Optional)
+                  {uploadingHero && (
+                    <span className="ml-2 inline-flex items-center">
+                      <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                      Uploading...
+                    </span>
                   )}
-                </FileDropzone>
+                </Label>
+                <FileDropzone
+                  accept="image/*"
+                  maxSize={15 * 1024 * 1024} // 15MB
+                  onFileChange={handleHeroChange}
+                  currentFile={heroImage}
+                  placeholder="Drop your hero image here or click to browse"
+                />
+                <p className="text-xs text-muted-foreground">Recommended: 16:9 aspect ratio, PNG or JPG, max 15MB</p>
               </div>
             </CardContent>
           </Card>

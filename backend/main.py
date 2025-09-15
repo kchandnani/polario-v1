@@ -23,17 +23,8 @@ async def lifespan(app: FastAPI):
     # Startup
     print("🚀 Polario Backend starting up...")
     
-    # Install Playwright browsers if needed
-    try:
-        from playwright.async_api import async_playwright
-        async with async_playwright() as p:
-            # Check if browsers are installed
-            browser = await p.chromium.launch()
-            await browser.close()
-            print("✅ Playwright browsers ready")
-    except Exception as e:
-        print(f"⚠️  Playwright setup needed: {e}")
-        print("Run: playwright install chromium")
+    # HTMLCSStoImage service ready
+    print("✅ HTMLCSStoImage render service ready")
     
     yield
     

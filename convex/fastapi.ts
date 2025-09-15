@@ -91,8 +91,8 @@ export const generateBrochure = action({
           template: "product_a",
           palette: { primary: "#2563eb" }
         },
-        pdfUrl: renderResponse.pdf_url,
-        pngUrl: renderResponse.png_url,
+        pdfUrl: renderResponse?.pdf_url || "pending",
+        pngUrl: renderResponse?.png_url || null,
       });
 
       // Update job as completed

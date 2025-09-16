@@ -96,16 +96,16 @@ class RenderService:
         """Render HTML template with provided data"""
         
         try:
-            # Get template from layout data
-            template_name = request.layout_data.template + ".html"
+            # Get template from request
+            template_name = request.template + ".html"
             template = self.jinja_env.get_template(template_name)
             
             # Prepare template context
             context = {
                 "copy": request.copy_data.dict(),
                 "assets": request.assets or {},
-                "layout": request.layout_data.dict(),
-                "palette": request.layout_data.palette.dict() if request.layout_data.palette else {"primary": "#2563eb"}
+                "template": request.template,
+                "palette": {"primary": "#2563eb"}  # Default palette
             }
             
             # Render HTML

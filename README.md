@@ -7,6 +7,7 @@ Transform your business information into stunning, print-ready marketing brochur
 - **🧠 Enhanced AI Copywriting**: Multi-stage AI processing with industry-specific intelligence
 - **🎨 Dynamic Variant System**: 6+ professional design styles with deterministic randomness
 - **📄 PDF Generation**: High-quality PDF output with PNG thumbnails (A4 print-ready)
+- **🖼️ Image Integration**: Logo and hero image upload with automatic embedding
 - **🏭 Industry Intelligence**: Tailored messaging for 7+ business types
 - **🎭 Smart Style Analysis**: AI-generated design hints based on business context
 - **🔐 Secure Authentication**: Clerk-based user management
@@ -27,6 +28,7 @@ Transform your business information into stunning, print-ready marketing brochur
 - **AI**: Google Gemini 2.5 Flash
 - **PDF Generation**: HTMLCSStoImage (serverless)
 - **Templates**: Jinja2 + HTML/CSS with dynamic variants
+- **Image Processing**: Automatic embedding with fallback placeholders
 - **Industry Intelligence**: Built-in copywriting patterns
 - **Variant System**: Deterministic design variations with professional palettes
 
@@ -56,6 +58,29 @@ Polario uses a sophisticated variant system to ensure each brochure has a unique
 - Icon treatments (numbers/checks/text-only)
 - CTA styles (filled/outline/panel)
 - Typography scaling (compact/normal/comfort)
+
+## 🖼️ Image Upload & Integration
+
+Polario seamlessly integrates user-uploaded images into professional brochures:
+
+### **Upload Process**
+- **Logo Upload**: Square format recommended, up to 15MB
+- **Hero Image**: 16:9 aspect ratio recommended, up to 15MB
+- **Secure Storage**: Files stored in Convex's built-in CDN storage
+- **Auto-Processing**: Automatic dimension detection and metadata extraction
+
+### **PDF Integration**
+- **Dynamic Embedding**: Images automatically embedded in generated PDFs
+- **Smart Positioning**: Logo and hero placement varies by design variant
+- **Fallback System**: Professional placeholders when images not provided
+- **Print Optimization**: Images sized and positioned for A4 layout
+
+### **Technical Flow**
+1. **Frontend**: Secure file upload via Convex `generateUploadUrl()`
+2. **Storage**: Files stored with metadata in Convex database
+3. **Generation**: Public URLs generated for PDF rendering service
+4. **Rendering**: HTMLCSStoImage downloads and embeds images in final PDF
+5. **Delivery**: High-quality PDFs with properly embedded images
 
 ## 🚦 Quick Start
 

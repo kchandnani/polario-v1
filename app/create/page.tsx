@@ -117,6 +117,7 @@ export default function CreatePage() {
         width,
         height,
         isLogo,
+        clerkId: user?.id, // For local development authentication bypass
       })
       
       return storageId

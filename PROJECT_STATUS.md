@@ -265,6 +265,7 @@ Polario has successfully evolved from a basic scaffolding to a sophisticated AI-
 - 🎲 **Deterministic Selection**: Same project always gets same style (reproducible)
 - 🧠 **AI Style Analysis**: Business context influences design choices
 - 🎭 **Dynamic Layouts**: Hero positioning, logo placement, card styles, typography scaling
+- 🖼️ **Image Integration**: Secure upload, storage, and automatic PDF embedding
 - 📄 **Print Optimization**: Professional A4 layouts with proper margins and typography
 - 📚 **Complete Documentation**: Template registry with all constraints and variations
 

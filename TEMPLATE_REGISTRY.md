@@ -14,9 +14,11 @@ This document defines the constraints, variants, and behavior of the Polario bro
 - **Bullet Count**: Exactly 3 required
 
 ### Asset Requirements
-- **Logo**: ≤160×64px, any format
-- **Hero Image**: 16:9 aspect ratio, ≥1600px width recommended
-- **Feature Images**: 1:1 aspect ratio recommended (placeholders provided)
+- **Logo**: Square format recommended, PNG/JPG, ≤15MB
+- **Hero Image**: 16:9 aspect ratio recommended, PNG/JPG, ≤15MB, ≥1600px width optimal
+- **Storage**: Convex built-in storage with CDN delivery
+- **Processing**: Automatic dimension detection and metadata extraction
+- **Fallbacks**: Professional placeholders for missing images
 
 ### Print Specifications
 - **Page Size**: A4 (8.27" × 11.69")
@@ -61,6 +63,64 @@ This document defines the constraints, variants, and behavior of the Polario bro
 - **Separators**: `none`, `subtle` (lines), or `dotted` (dashed lines)
 - **Typography Scale**: `type-compact` (-1pt), `type-normal`, `type-comfort` (+1pt)
 - **Micro-texture**: `paper-none`, `paper-subtle` (grain), `paper-grid` (dots)
+
+## 🖼️ Image Integration System
+
+### Upload & Storage Architecture
+- **Frontend Upload**: Secure file upload via `generateUploadUrl()` mutation
+- **Convex Storage**: Built-in file storage with CDN distribution
+- **Metadata Tracking**: Asset records with dimensions, MIME type, size
+- **Security**: Time-limited upload URLs with authentication
+
+### Database Schema (Assets Table)
+```typescript
+assets: {
+  projectId: v.id("projects"),
+  storageId: v.id("_storage"),  // Convex storage reference
+  mimeType: v.string(),         // image/jpeg, image/png, etc.
+  size: v.number(),             // File size in bytes
+  width: v.optional(v.number()), // Auto-detected image width
+  height: v.optional(v.number()), // Auto-detected image height
+  isLogo: v.boolean(),          // true for logo, false for hero
+  uploadedAt: v.number(),       // Upload timestamp
+}
+```
+
+### PDF Generation Flow
+1. **Asset Retrieval**: `getAssetUrl()` generates public Convex URLs
+2. **URL Mapping**: Assets mapped to `{ "logo": "url", "hero": "url" }`
+3. **Template Rendering**: Jinja2 templates receive asset URLs
+4. **Image Embedding**: HTMLCSStoImage downloads and embeds images
+5. **Final Output**: PDF with properly positioned, embedded images
+
+### Template Integration
+```html
+<!-- Logo positioning (varies by variant) -->
+{% if assets.logo %}
+<img src="{{ assets.logo }}" alt="Company Logo" class="company-logo">
+{% else %}
+<div class="logo-placeholder">[LOGO PLACEHOLDER]</div>
+{% endif %}
+
+<!-- Hero image (layout varies by variant) -->
+{% if assets.hero %}
+<img src="{{ assets.hero }}" alt="Hero Image" class="hero-image">
+{% else %}
+<div class="hero-placeholder">[HERO IMAGE PLACEHOLDER]</div>
+{% endif %}
+```
+
+### Variant-Based Positioning
+- **Logo**: Header-left/right or hero-overlay based on variant
+- **Hero**: Left/right/full-width layout based on variant selection
+- **Responsive**: Images scale appropriately for A4 print dimensions
+- **Fallbacks**: Professional placeholders maintain layout integrity
+
+### Quality Assurance
+- **Format Support**: PNG, JPG, WebP, and other web formats
+- **Size Limits**: 15MB maximum to ensure reasonable upload times
+- **Dimension Validation**: Automatic detection prevents layout issues
+- **Print Safety**: Images optimized for A4 print resolution
 
 ## 🎯 Palette Packs
 

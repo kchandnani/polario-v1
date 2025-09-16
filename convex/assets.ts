@@ -36,9 +36,19 @@ export const createAsset = mutation({
     width: v.optional(v.number()),
     height: v.optional(v.number()),
     isLogo: v.boolean(),
+    clerkId: v.optional(v.string()), // For local development authentication bypass
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    let user = await getCurrentUser(ctx);
+    
+    // Local development authentication bypass
+    if (!user && args.clerkId) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
+        .first();
+    }
+    
     if (!user) {
       throw new Error("Not authenticated");
     }

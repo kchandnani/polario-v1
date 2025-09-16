@@ -71,8 +71,11 @@ export const createAsset = mutation({
       throw new Error("Invalid file type. Only JPEG, PNG, and SVG are allowed.");
     }
 
+    // Extract clerkId from args before database insert
+    const { clerkId, ...assetData } = args;
+    
     const assetId = await ctx.db.insert("assets", {
-      ...args,
+      ...assetData,
       uploadedAt: Date.now(),
     });
 

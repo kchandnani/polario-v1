@@ -16,6 +16,7 @@ import json
 
 from app.models.content import RenderRequest, RenderResponse, LayoutData
 from app.core.config import settings
+from app.services.variant_system import VariantSystem
 
 class RenderService:
     """Service for rendering brochures to PDF and PNG using HTMLCSStoImage"""
@@ -90,19 +91,26 @@ class RenderService:
             template_name = request.template + ".html"
             template = self.jinja_env.get_template(template_name)
             
-            # Read CSS file content
-            css_path = self.templates_dir / "base.css"
-            css_content = ""
-            if css_path.exists():
-                with open(css_path, 'r', encoding='utf-8') as f:
-                    css_content = f.read()
+            # Generate variant configuration based on project and style hints
+            copy_dict = request.copy_data.dict()
+            style_hints = copy_dict.get("style_hints", {}) if copy_dict.get("style_hints") else None
             
-            # Prepare template context
+            variant_config = VariantSystem.generate_variant_config(
+                project_id=request.project_id,
+                style_hints=style_hints
+            )
+            
+            # Generate dynamic CSS with variant configuration
+            css_template = self.jinja_env.get_template("dynamic_base.css")
+            css_content = css_template.render(variant=variant_config, palette=variant_config["palette"])
+            
+            # Prepare template context with variant configuration
             context = {
-                "copy": request.copy_data.dict(),
+                "copy": copy_dict,
                 "assets": request.assets or {},
                 "template": request.template,
-                "palette": {"primary": "#2563eb"},  # Default palette
+                "variant": variant_config,  # Full variant configuration
+                "palette": variant_config["palette"],  # Palette from variant
                 "css_content": css_content  # Pass CSS content to template
             }
             

@@ -5,9 +5,10 @@ Transform your business information into stunning, print-ready marketing brochur
 ## 🚀 Features
 
 - **🧠 Enhanced AI Copywriting**: Multi-stage AI processing with industry-specific intelligence
-- **🎨 Professional Templates**: Print-ready designs optimized for A4/Letter formats  
-- **📄 PDF Generation**: High-quality PDF output with PNG thumbnails
+- **🎨 Dynamic Variant System**: 6+ professional design styles with deterministic randomness
+- **📄 PDF Generation**: High-quality PDF output with PNG thumbnails (A4 print-ready)
 - **🏭 Industry Intelligence**: Tailored messaging for 7+ business types
+- **🎭 Smart Style Analysis**: AI-generated design hints based on business context
 - **🔐 Secure Authentication**: Clerk-based user management
 - **📊 Real-time Progress**: Live job tracking with WebSocket updates
 - **☁️ Cloud Storage**: Convex-powered file storage and database
@@ -25,8 +26,36 @@ Transform your business information into stunning, print-ready marketing brochur
 - **API**: FastAPI with async support
 - **AI**: Google Gemini 2.5 Flash
 - **PDF Generation**: HTMLCSStoImage (serverless)
-- **Templates**: Jinja2 + HTML/CSS
+- **Templates**: Jinja2 + HTML/CSS with dynamic variants
 - **Industry Intelligence**: Built-in copywriting patterns
+- **Variant System**: Deterministic design variations with professional palettes
+
+## 🎨 Design Variant System
+
+Polario uses a sophisticated variant system to ensure each brochure has a unique, professional appearance:
+
+### **6 Professional Styles**
+- **Minimal Steel**: Clean corporate design with steel/copper palette
+- **Agency Copper**: Warm, personal style with copper accents
+- **Editorial Nickel**: Modern, tech-focused with nickel tones
+- **Executive Tungsten**: Luxury feel with tungsten/brown palette
+- **Bold Charcoal**: High-contrast with charcoal/bronze
+- **Classic Pewter**: Traditional with pewter/gold accents
+
+### **Dynamic Features**
+- **Deterministic Selection**: Same project always gets same style (reproducible)
+- **AI Style Hints**: Business analysis influences design choices
+- **Professional Palettes**: Metallic color schemes (no bright colors)
+- **Layout Variations**: Hero positioning, logo placement, card styles
+- **Print Optimization**: A4-ready with proper margins and typography
+
+### **Customization Dimensions**
+- Hero layout (left/right/full-width)
+- Logo positioning (header-left/right/hero-overlay)  
+- Feature card styles (outline/soft/divided)
+- Icon treatments (numbers/checks/text-only)
+- CTA styles (filled/outline/panel)
+- Typography scaling (compact/normal/comfort)
 
 ## 🚦 Quick Start
 

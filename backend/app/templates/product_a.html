@@ -10,8 +10,25 @@
 </head>
 <body>
     <div class="brochure-page">
-        <!-- Header Section -->
+        <!-- Header Section with dynamic logo positioning -->
         <header class="brochure-header">
+            {% if variant.logo_positioning == "header-right" %}
+            <div class="header-left">
+                <h1 class="main-headline">{{ copy.headline }}</h1>
+                {% if copy.subheadline %}
+                <p class="sub-headline">{{ copy.subheadline }}</p>
+                {% endif %}
+            </div>
+            <div class="header-right">
+                <div class="logo-placeholder">
+                    {% if assets.logo %}
+                    <img src="{{ assets.logo }}" alt="Company Logo" class="logo">
+                    {% else %}
+                    <div class="logo-placeholder-box">[LOGO]</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
             <div class="header-left">
                 <div class="logo-placeholder">
                     {% if assets.logo %}
@@ -27,18 +44,37 @@
                 <p class="sub-headline">{{ copy.subheadline }}</p>
                 {% endif %}
             </div>
+            {% endif %}
         </header>
 
-        <!-- Hero Image Section -->
+        <!-- Hero Image Section with layout variants -->
         <section class="hero-section">
-            {% if assets.hero %}
-            <img src="{{ assets.hero }}" alt="Hero Image" class="hero-image">
+            {% if variant.hero_layout == "hero-full" %}
+                {% if assets.hero %}
+                <img src="{{ assets.hero }}" alt="Hero Image" class="hero-image">
+                <div class="hero-overlay">
+                    <h1 class="main-headline">{{ copy.headline }}</h1>
+                    {% if copy.subheadline %}
+                    <p class="sub-headline">{{ copy.subheadline }}</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="hero-placeholder">[HERO IMAGE PLACEHOLDER]</div>
+                {% endif %}
+                
+                {% if variant.logo_positioning == "hero-overlay" and assets.logo %}
+                <img src="{{ assets.logo }}" alt="Company Logo" class="logo-overlay">
+                {% endif %}
             {% else %}
-            <div class="hero-placeholder">[HERO IMAGE PLACEHOLDER]</div>
+                {% if assets.hero %}
+                <img src="{{ assets.hero }}" alt="Hero Image" class="hero-image">
+                {% else %}
+                <div class="hero-placeholder">[HERO IMAGE PLACEHOLDER]</div>
+                {% endif %}
             {% endif %}
         </section>
 
-        <!-- 3-Column Features Grid -->
+        <!-- 3-Column Features Grid with icon treatments -->
         <section class="features-section">
             <div class="features-grid">
                 {% for bullet in copy.bullets %}
@@ -46,6 +82,13 @@
                     <div class="feature-image-placeholder">
                         <div class="image-placeholder">[IMAGE {{ loop.index }}]</div>
                     </div>
+                    
+                    {% if variant.feature_icon_treatment == "number-badges" %}
+                    <div class="feature-number">{{ loop.index }}</div>
+                    {% elif variant.feature_icon_treatment == "check-icons" %}
+                    <div class="feature-check"></div>
+                    {% endif %}
+                    
                     <h3 class="feature-headline">{{ bullet.title }}</h3>
                     <p class="feature-description">{{ bullet.desc }}</p>
                 </div>

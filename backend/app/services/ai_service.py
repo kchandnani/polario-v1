@@ -177,6 +177,12 @@ class AIService:
         - Bullet descriptions: ≤120 characters each
         - CTA label: ≤25 characters
         - CTA sub: ≤50 characters (optional)
+        
+        STYLE ANALYSIS:
+        Analyze the business and suggest design preferences:
+        - tone: "professional" (B2B/services), "minimal" (tech/modern), "bold" (consumer/lifestyle)
+        - variant_bias: "steel" (corporate), "copper" (warm/personal), "nickel" (tech), "tungsten" (luxury), "charcoal" (bold), "pewter" (classic)
+        - layout_bias: "hero-right" (services), "hero-left" (products), "hero-full" (lifestyle/visual)
 
         CRITICAL: Return ONLY a valid JSON object. No explanations, no markdown, no code blocks.
         
@@ -201,6 +207,11 @@ class AIService:
             "cta": {{
                 "label": "Action-oriented CTA",
                 "sub": "Urgency/value element"
+            }},
+            "style_hints": {{
+                "tone": "professional|minimal|bold",
+                "variant_bias": "copper|steel|nickel|tungsten|charcoal|pewter", 
+                "layout_bias": "hero-left|hero-right|hero-full"
             }}
         }}
         
@@ -225,6 +236,11 @@ class AIService:
             "cta": {{
                 "label": "Start Your Free Trial",
                 "sub": "No credit card required"
+            }},
+            "style_hints": {{
+                "tone": "professional",
+                "variant_bias": "steel",
+                "layout_bias": "hero-right"
             }}
         }}
         """

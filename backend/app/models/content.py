@@ -29,12 +29,19 @@ class CallToAction(BaseModel):
     label: str = Field(..., max_length=25, description="CTA button text")
     sub: Optional[str] = Field(None, max_length=50, description="CTA sub-text")
 
+class StyleHints(BaseModel):
+    """AI-generated style hints for variant selection"""
+    tone: Optional[str] = Field(None, description="professional|minimal|bold")
+    variant_bias: Optional[str] = Field(None, description="copper|steel|nickel|tungsten|charcoal|pewter")
+    layout_bias: Optional[str] = Field(None, description="hero-left|hero-right|hero-full")
+
 class CopyData(BaseModel):
     """Generated marketing copy data"""
     headline: str = Field(..., max_length=90, description="Main headline")
     subheadline: Optional[str] = Field(None, max_length=140, description="Sub-headline")
     bullets: List[BulletPoint] = Field(..., min_items=3, max_items=3, description="Exactly 3 bullet points")
     cta: Optional[CallToAction] = Field(None, description="Call to action")
+    style_hints: Optional[StyleHints] = Field(None, description="Style preferences for variant selection")
 
 class ContentResponse(BaseModel):
     """Response from AI content generation"""

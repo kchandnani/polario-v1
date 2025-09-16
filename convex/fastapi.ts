@@ -99,10 +99,16 @@ export const generateBrochure = action({
       });
 
       // Step 3: Store render results in Convex
+      // Handle null palette by converting to undefined (Convex prefers undefined over null)
+      const copyData = { ...aiResponse.copy_data };
+      if (copyData.palette === null) {
+        delete copyData.palette; // Remove null values, let optional field be undefined
+      }
+      
       const renderData: any = {
         jobId,
         projectId,
-        copyData: aiResponse.copy_data,
+        copyData: copyData,
         layoutData: {
           template: "product_a",
           palette: { primary: "#2563eb" }

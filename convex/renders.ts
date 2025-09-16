@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getCurrentUser } from "./users";
 
-// Create a new render record
+// Create a new render record - updated
 export const create = mutation({
   args: {
     jobId: v.id("jobs"),
@@ -18,6 +18,7 @@ export const create = mutation({
         label: v.string(),
         sub: v.optional(v.string()),
       })),
+      palette: v.optional(v.string()), // AI-selected palette
     }),
     layoutData: v.object({
       template: v.string(),

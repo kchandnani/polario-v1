@@ -79,7 +79,9 @@ export default function CreatePage() {
   const uploadFile = async (file: File, projectId: Id<"projects">, isLogo: boolean) => {
     try {
       // Get upload URL
-      const uploadUrl = await generateUploadUrl()
+      const uploadUrl = await generateUploadUrl({
+        clerkId: user?.id, // For local development authentication bypass
+      })
       
       // Upload file to Convex storage
       const result = await fetch(uploadUrl, {

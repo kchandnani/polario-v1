@@ -96,6 +96,13 @@ export default defineSchema({
           sub: v.optional(v.string()),
         })
       ),
+      style_hints: v.optional(
+        v.object({
+          tone: v.optional(v.string()),
+          variant_bias: v.optional(v.string()),
+          layout_bias: v.optional(v.string()),
+        })
+      ),
     }),
     layoutData: v.object({
       template: v.string(),

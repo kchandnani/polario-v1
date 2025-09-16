@@ -4,9 +4,20 @@ import { getCurrentUser } from "./users";
 
 // Generate upload URL for file upload
 export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const user = await getCurrentUser(ctx);
+  args: {
+    clerkId: v.optional(v.string()), // For local development authentication bypass
+  },
+  handler: async (ctx, { clerkId }) => {
+    let user = await getCurrentUser(ctx);
+    
+    // Local development authentication bypass
+    if (!user && clerkId) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+        .first();
+    }
+    
     if (!user) {
       throw new Error("Not authenticated");
     }

@@ -49,20 +49,27 @@ class RenderService:
         """
         
         try:
+            print(f"🔍 DEBUG: Starting generate_brochure")
             start_time = time.time()
             
             # Step 1: Load and render HTML template
+            print(f"🔍 DEBUG: Step 1 - Rendering HTML template")
             html_content = await self._render_html_template(request)
+            print(f"🔍 DEBUG: HTML template rendered, length: {len(html_content)}")
             
             # Step 2: Generate PDF using HTMLCSStoImage
+            print(f"🔍 DEBUG: Step 2 - Starting PDF generation")
             pdf_url = await self._generate_pdf(html_content)
+            print(f"🔍 DEBUG: PDF generation completed, URL: {pdf_url}")
             
             # Step 3: Generate PNG thumbnail (optional)
+            print(f"🔍 DEBUG: Step 3 - Starting PNG generation")
             png_url = await self._generate_png(html_content)
+            print(f"🔍 DEBUG: PNG generation completed, URL: {png_url}")
             
             generation_time = time.time() - start_time
             
-            return RenderResponse(
+            response = RenderResponse(
                 success=True,
                 pdf_url=pdf_url,
                 png_url=png_url,
@@ -70,14 +77,20 @@ class RenderService:
                 message=f"Brochure generated successfully in {generation_time:.2f}s"
             )
             
+            print(f"🔍 DEBUG: Final response: success={response.success}, pdf_url={response.pdf_url}, png_url={response.png_url}")
+            return response
+            
         except Exception as e:
-            return RenderResponse(
+            print(f"🔍 DEBUG: Exception in generate_brochure: {str(e)}")
+            response = RenderResponse(
                 success=False,
                 pdf_url=None,
                 png_url=None,
                 render_time=0,
                 message=f"Brochure generation failed: {str(e)}"
             )
+            print(f"🔍 DEBUG: Error response: {response}")
+            return response
     
     async def _render_html_template(self, request: RenderRequest) -> str:
         """Render HTML template with provided data"""

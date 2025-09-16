@@ -96,6 +96,7 @@ export default defineSchema({
           sub: v.optional(v.string()),
         })
       ),
+      palette: v.optional(v.string()),
     }),
     layoutData: v.object({
       template: v.string(),

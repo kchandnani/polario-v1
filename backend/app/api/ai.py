@@ -32,10 +32,6 @@ async def generate_copy(
     3. Validation and conformance to constraints
     """
     
-    print(f"🔍 DEBUG: Received request to /api/ai/generate-copy")
-    print(f"🔍 DEBUG: Request data: {request.dict()}")
-    print(f"🔍 DEBUG: Credentials: {credentials}")
-    
     try:
         # Verify auth (optional for local development)
         auth = await verify_clerk_token(credentials)

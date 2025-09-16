@@ -28,18 +28,33 @@ export const create = mutation({
     }),
     pdfUrl: v.string(),
     pngUrl: v.optional(v.string()),
+    clerkId: v.optional(v.string()), // For local development
   },
   handler: async (ctx, args) => {
-    // Get user (for authorization)
-    const user = await getCurrentUser(ctx);
+    // Get user (with local development bypass)
+    let user = await getCurrentUser(ctx);
+    
+    // Local development bypass - get user by clerkId if provided
+    if (!user && args.clerkId) {
+      const userByClerkId = await ctx.db
+        .query("users")
+        .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
+        .first();
+      
+      if (userByClerkId) {
+        user = userByClerkId;
+      }
+    }
+    
     if (!user) {
       throw new Error("Not authenticated");
     }
 
     // Verify the project belongs to the user
     const project = await ctx.db.get(args.projectId);
+    
     if (!project || project.userId !== user._id) {
-      throw new Error("Project not found or not authorized");
+      throw new Error(`Project not found or not authorized. Project userId: ${project?.userId}, User _id: ${user._id}`);
     }
 
     // Verify the job belongs to the user

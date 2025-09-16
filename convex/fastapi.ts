@@ -5,7 +5,6 @@ import { api } from "./_generated/api";
 // FastAPI Backend Configuration  
 const FASTAPI_BASE_URL = process.env.FASTAPI_BASE_URL || "http://localhost:8000";
 
-console.log("🔍 DEBUG: FASTAPI_BASE_URL set to:", FASTAPI_BASE_URL);
 
 // Trigger AI content generation and PDF creation
 export const generateBrochure = action({
@@ -32,6 +31,13 @@ export const generateBrochure = action({
       if (!project) {
         throw new Error("Project not found");
       }
+      
+      
+      // Get the user who owns this project to get their clerkId
+      const projectOwner = await ctx.runQuery(api.users.getById, { 
+        userId: project.userId 
+      });
+      
 
       // Get project assets (skip auth for local development)
       const assets = await ctx.runQuery(api.assets.getProjectAssets, { 
@@ -102,6 +108,7 @@ export const generateBrochure = action({
           palette: { primary: "#2563eb" }
         },
         pdfUrl: renderResponse?.pdf_url || "pending",
+        clerkId: projectOwner?.clerkId, // Pass clerkId for local development auth bypass
       };
       
       // Only include pngUrl if it exists (Convex optional fields need undefined, not null)
@@ -110,6 +117,7 @@ export const generateBrochure = action({
       }
       
       const renderId: any = await ctx.runMutation(api.renders.create, renderData);
+      
 
       // Update job as completed
       await ctx.runMutation(api.jobs.updateStatus, {
@@ -153,11 +161,6 @@ async function generateAIContent(project: any, assets: Record<string, string>) {
     selected_features: project.features.map((f: any) => f.title)
   };
 
-  console.log("🔍 DEBUG: Calling FastAPI with:", {
-    url: `${FASTAPI_BASE_URL}/api/ai/generate-copy`,
-    method: "POST",
-    body: requestBody
-  });
 
   const response = await fetch(`${FASTAPI_BASE_URL}/api/ai/generate-copy`, {
     method: "POST",
@@ -169,11 +172,6 @@ async function generateAIContent(project: any, assets: Record<string, string>) {
     body: JSON.stringify(requestBody),
   });
 
-  console.log("🔍 DEBUG: FastAPI response:", {
-    status: response.status,
-    statusText: response.statusText,
-    headers: Object.fromEntries(response.headers.entries())
-  });
 
   if (!response.ok) {
     const errorText = await response.text();

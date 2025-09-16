@@ -89,6 +89,14 @@ export const getUserByClerkId = query({
   },
 });
 
+// Get user by ID (for actions)
+export const getById = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db.get(userId);
+  },
+});
+
 // Delete user (for Clerk webhook)
 export const deleteUser = mutation({
   args: { clerkId: v.string() },

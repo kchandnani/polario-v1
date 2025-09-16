@@ -24,7 +24,7 @@ Transform your business information into stunning, print-ready marketing brochur
 ### Backend (FastAPI)
 - **API**: FastAPI with async support
 - **AI**: Google Gemini 2.5 Flash
-- **PDF Generation**: Playwright (Chromium)
+- **PDF Generation**: HTMLCSStoImage (serverless)
 - **Templates**: Jinja2 + HTML/CSS
 - **Industry Intelligence**: Built-in copywriting patterns
 
@@ -36,6 +36,7 @@ Transform your business information into stunning, print-ready marketing brochur
 - Google AI API key
 - Clerk account
 - Convex account
+- HTMLCSStoImage account (free tier available)
 
 ### 1. Frontend Setup
 
@@ -63,12 +64,9 @@ cd backend
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Install Playwright browsers
-playwright install chromium
-
 # Configure environment
 cp env.example .env
-# Edit .env with your API keys
+# Edit .env with your API keys (including HTMLCSStoImage credentials)
 
 # Start FastAPI server
 python main.py

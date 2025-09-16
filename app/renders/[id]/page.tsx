@@ -5,15 +5,50 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Container } from "@/components/container"
 import { Download, Eye, Share2, ArrowLeft, CheckCircle } from "lucide-react"
-import { apiClient } from "@/lib/client"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import Link from "next/link"
+import { use } from "react"
+import { Id } from "@/convex/_generated/dataModel"
 
 interface RenderPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default function RenderPage({ params }: RenderPageProps) {
-  const { data: render, error, isLoading } = apiClient.getRender(params.id)
+  const { id } = use(params)
+  
+  // Check if the ID looks like a project ID (starts with 'js7') instead of render ID (starts with 'jn7')
+  const isProjectId = id.startsWith('js7')
+  
+  const render = useQuery(
+    api.renders.getById, 
+    isProjectId ? "skip" : { renderId: id as Id<"renders"> }
+  )
+  const isLoading = render === undefined && !isProjectId
+  const error = isProjectId ? "This appears to be an old job with an invalid render ID. Please generate a new brochure." : null
+
+  if (error) {
+    return (
+      <div className="py-8">
+        <Container>
+          <div className="max-w-2xl mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-red-600">Invalid Render ID</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">{error}</p>
+                <Button asChild>
+                  <Link href="/create">Generate New Brochure</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </Container>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -60,8 +95,8 @@ export default function RenderPage({ params }: RenderPageProps) {
     )
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -198,7 +233,7 @@ export default function RenderPage({ params }: RenderPageProps) {
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Render ID:</span>
-                <span className="font-mono text-sm">{render.id}</span>
+                <span className="font-mono text-sm">{render._id}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Generated:</span>

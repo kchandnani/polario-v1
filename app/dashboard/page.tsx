@@ -14,6 +14,22 @@ import { Plus, FileText, Calendar, MoreHorizontal, TrendingUp, CheckCircle, Cloc
 
 export default function DashboardPage() {
   const { user, isLoaded } = useUser()
+  
+  // Always call useQuery at the top level to avoid hooks order issues
+  const projects = useQuery(api.projects.getUserProjects, 
+    user ? { clerkId: user.id } : "skip"
+  ) || []
+  
+  // Fetch jobs to get the correct render IDs
+  const jobs = useQuery(api.jobs.getUserJobs,
+    user ? { clerkId: user.id } : "skip"
+  ) || []
+
+  // Helper function to get render ID for a project
+  const getRenderIdForProject = (projectId: string) => {
+    const job = jobs.find((j: any) => j.projectId === projectId && j.status === "done")
+    return job?.resultId || null
+  }
 
   // Show loading while Clerk is initializing
   if (!isLoaded) {
@@ -44,10 +60,6 @@ export default function DashboardPage() {
       </div>
     )
   }
-
-  const projects = useQuery(api.projects.getUserProjects, 
-    user ? { clerkId: user.id } : "skip"
-  ) || []
 
   const getStatusColor = (status: "draft" | "processing" | "completed" | "error") => {
     switch (status) {
@@ -187,12 +199,22 @@ export default function DashboardPage() {
 
                       <div className="flex gap-2">
                         {project.status === "completed" ? (
-                          <Button size="sm" asChild className="flex-1">
-                            <Link href={`/renders/${project._id}`}>
-                              <FileText className="w-4 h-4 mr-2" />
-                              View Result
-                            </Link>
-                          </Button>
+                          (() => {
+                            const renderId = getRenderIdForProject(project._id)
+                            return renderId ? (
+                              <Button size="sm" asChild className="flex-1">
+                                <Link href={`/renders/${renderId}`}>
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  View Result
+                                </Link>
+                              </Button>
+                            ) : (
+                              <Button size="sm" variant="outline" disabled className="flex-1">
+                                <FileText className="w-4 h-4 mr-2" />
+                                No Result Available
+                              </Button>
+                            )
+                          })()
                         ) : project.status === "processing" ? (
                           <Button size="sm" variant="outline" asChild className="flex-1">
                             <Link href={`/jobs/${project._id}`}>View Progress</Link>

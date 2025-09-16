@@ -1,6 +1,6 @@
 /* 
-Polario Base Styles
-Print-optimized CSS for professional brochure templates
+Polario Print Brochure Template
+Professional A4 brochure layout with 50/50 text-image balance
 */
 
 /* Reset and base styles */
@@ -13,7 +13,7 @@ Print-optimized CSS for professional brochure templates
 /* Print-specific styles */
 @page {
     size: A4;
-    margin: 0.5in;
+    margin: 0.75in;
 }
 
 @media print {
@@ -24,17 +24,18 @@ Print-optimized CSS for professional brochure templates
     }
     
     body {
-        font-size: 12pt;
-        line-height: 1.4;
+        font-size: 11pt;
+        line-height: 1.3;
     }
 }
 
 /* Typography */
 body {
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    color: #1f2937;
-    line-height: 1.6;
+    color: #2d3748;
+    line-height: 1.5;
     background: white;
+    font-size: 11pt;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -44,280 +45,268 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 24pt;
     font-weight: 800;
+    color: #1a202c;
 }
 
 h2 {
-    font-size: 1.875rem;
+    font-size: 18pt;
     font-weight: 700;
+    color: #2d3748;
 }
 
 h3 {
-    font-size: 1.25rem;
+    font-size: 14pt;
     font-weight: 600;
+    color: #2d3748;
 }
 
 p {
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    line-height: 1.6;
+    margin-bottom: 0.75rem;
+    font-size: 11pt;
+    line-height: 1.4;
 }
 
 /* Brand colors */
 :root {
     --primary-color: #2563eb;
-    --primary-dark: #1d4ed8;
+    --primary-light: #3b82f6;
     --accent-color: #f59e0b;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --text-light: #9ca3af;
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-light: #718096;
     --background: #ffffff;
-    --surface: #f9fafb;
-    --border: #e5e7eb;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
+    --border-light: #e2e8f0;
+    --surface-light: #f7fafc;
 }
 
-/* Layout containers */
-.brochure-container {
+/* Main brochure layout */
+.brochure-page {
     width: 100%;
-    max-width: 8.5in;
-    min-height: 11in;
+    max-width: 8.27in; /* A4 width minus margins */
+    min-height: 11.69in; /* A4 height */
     margin: 0 auto;
     background: white;
-    position: relative;
+    padding: 0.5in;
+    display: flex;
+    flex-direction: column;
 }
 
-.section {
-    padding: 2rem 0;
-    position: relative;
+/* Header Section - Logo + Headlines */
+.brochure-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary-color);
 }
 
-.section-hero {
-    padding: 3rem 0;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    color: white;
+.header-left {
+    flex: 0 0 200px;
+}
+
+.logo {
+    max-width: 180px;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+.logo-placeholder-box {
+    width: 180px;
+    height: 60px;
+    border: 2px dashed var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12pt;
+    color: var(--text-light);
+    background: var(--surface-light);
+}
+
+.header-right {
+    flex: 1;
+    padding-left: 2rem;
+    text-align: right;
+}
+
+.main-headline {
+    font-size: 28pt;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+}
+
+.sub-headline {
+    font-size: 14pt;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 0;
+}
+
+/* Hero Image Section */
+.hero-section {
+    margin-bottom: 2rem;
     text-align: center;
-}
-
-.section-features {
-    padding: 3rem 0;
-    background: white;
-}
-
-.section-cta {
-    padding: 2.5rem 0;
-    background: var(--surface);
-    text-align: center;
-}
-
-/* Grid system */
-.container {
-    max-width: 7.5in;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-.grid {
-    display: grid;
-    gap: 2rem;
-}
-
-.grid-cols-1 {
-    grid-template-columns: 1fr;
-}
-
-.grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-.grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-/* Hero section */
-.hero-content {
-    position: relative;
-    z-index: 2;
 }
 
 .hero-image {
     width: 100%;
-    max-width: 600px;
-    height: 300px;
+    height: 3in;
     object-fit: cover;
-    border-radius: 12px;
-    margin: 2rem auto;
-    display: block;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
 }
 
-.hero-headline {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.hero-subheadline {
-    font-size: 1.25rem;
-    font-weight: 400;
-    margin-bottom: 2rem;
-    opacity: 0.95;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Logo */
-.logo {
-    position: absolute;
-    top: 2rem;
-    left: 2rem;
-    max-width: 160px;
-    max-height: 64px;
-    z-index: 10;
-}
-
-/* Features section */
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2.5rem;
-    margin-top: 2rem;
-}
-
-.feature-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border);
-    text-align: center;
-    transition: transform 0.2s ease;
-}
-
-.feature-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.feature-icon {
-    width: 48px;
-    height: 48px;
-    background: var(--primary-color);
-    border-radius: 12px;
-    margin: 0 auto 1rem;
+.hero-placeholder {
+    width: 100%;
+    height: 3in;
+    border: 2px dashed var(--border-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 16pt;
+    color: var(--text-light);
+    background: var(--surface-light);
+    border-radius: 8px;
 }
 
-.feature-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
+/* 3-Column Features Grid */
+.features-section {
+    margin-bottom: 2rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.feature-column {
+    text-align: center;
+    padding: 1rem;
+}
+
+.feature-image-placeholder {
+    margin-bottom: 1rem;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 120px;
+    border: 2px dashed var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10pt;
+    color: var(--text-light);
+    background: var(--surface-light);
+    border-radius: 6px;
     margin-bottom: 0.75rem;
 }
 
-.feature-description {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    line-height: 1.5;
+.feature-headline {
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
 }
 
-/* Call to action */
-.cta-content {
+.feature-description {
+    font-size: 11pt;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Call to Action Section */
+.cta-section {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.cta-box {
+    background: var(--primary-color);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
     max-width: 500px;
     margin: 0 auto;
 }
 
-.cta-button {
-    display: inline-block;
-    background: var(--primary-color);
-    color: white;
-    padding: 1rem 2.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    margin-top: 1rem;
-}
-
-.cta-button:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+.cta-headline {
+    font-size: 18pt;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
 .cta-subtitle {
+    font-size: 12pt;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+/* Footer Section */
+.brochure-footer {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.contact-info {
+    flex: 1;
+}
+
+.contact-info p {
+    font-size: 10pt;
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
 }
 
-/* Utilities */
-.text-center {
-    text-align: center;
+.contact-info strong {
+    color: var(--text-primary);
 }
 
-.text-left {
-    text-align: left;
-}
-
-.text-right {
+.footer-branding {
+    flex: 1;
     text-align: right;
 }
 
-.font-bold {
-    font-weight: 700;
-}
-
-.font-semibold {
-    font-weight: 600;
-}
-
-.text-primary {
+.company-tagline {
+    font-size: 11pt;
     color: var(--primary-color);
+    font-weight: 600;
+    font-style: italic;
+    margin-bottom: 0;
 }
-
-.text-secondary {
-    color: var(--text-secondary);
-}
-
-.mb-0 { margin-bottom: 0; }
-.mb-1 { margin-bottom: 0.25rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-3 { margin-bottom: 0.75rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.mb-8 { margin-bottom: 2rem; }
 
 /* Print optimizations */
 @media print {
-    .brochure-container {
+    .brochure-page {
         box-shadow: none;
         border: none;
+        padding: 0;
     }
     
-    .hero-image {
-        box-shadow: none;
-    }
-    
-    .feature-card {
+    .hero-image, .image-placeholder, .logo-placeholder-box, .hero-placeholder, .cta-box {
         break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid var(--border);
     }
     
-    .cta-button {
-        box-shadow: none;
+    .feature-column {
+        break-inside: avoid;
+    }
+    
+    .brochure-header, .hero-section, .features-section, .cta-section, .brochure-footer {
+        break-inside: avoid;
     }
 }

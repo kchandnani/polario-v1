@@ -90,12 +90,20 @@ class RenderService:
             template_name = request.template + ".html"
             template = self.jinja_env.get_template(template_name)
             
+            # Read CSS file content
+            css_path = self.templates_dir / "base.css"
+            css_content = ""
+            if css_path.exists():
+                with open(css_path, 'r', encoding='utf-8') as f:
+                    css_content = f.read()
+            
             # Prepare template context
             context = {
                 "copy": request.copy_data.dict(),
                 "assets": request.assets or {},
                 "template": request.template,
-                "palette": {"primary": "#2563eb"}  # Default palette
+                "palette": {"primary": "#2563eb"},  # Default palette
+                "css_content": css_content  # Pass CSS content to template
             }
             
             # Render HTML

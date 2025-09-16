@@ -107,6 +107,9 @@ class RenderService:
         """Generate PDF using HTMLCSStoImage API"""
         
         try:
+            print(f"🔍 DEBUG: Starting PDF generation with HTML length: {len(html_content)}")
+            print(f"🔍 DEBUG: API credentials - User: {self.api_user}, Key: {'*' * len(self.api_key) if self.api_key else 'None'}")
+            
             async with aiohttp.ClientSession() as session:
                 # Prepare API request
                 auth = aiohttp.BasicAuth(self.api_user, self.api_key)
@@ -119,6 +122,8 @@ class RenderService:
                     "print_background": True
                 }
                 
+                print(f"🔍 DEBUG: Making request to {self.api_base}/image")
+                
                 # Make API request
                 async with session.post(
                     f"{self.api_base}/image",
@@ -126,14 +131,20 @@ class RenderService:
                     json=data
                 ) as response:
                     
+                    print(f"🔍 DEBUG: HTMLCSStoImage response status: {response.status}")
+                    
                     if response.status == 200:
                         result = await response.json()
-                        return result.get("url", "")
+                        pdf_url = result.get("url", "")
+                        print(f"🔍 DEBUG: PDF generated successfully: {pdf_url}")
+                        return pdf_url
                     else:
                         error_text = await response.text()
+                        print(f"🔍 DEBUG: HTMLCSStoImage error: {response.status} - {error_text}")
                         raise Exception(f"PDF generation failed: {response.status} - {error_text}")
                         
         except Exception as e:
+            print(f"🔍 DEBUG: PDF generation exception: {str(e)}")
             raise Exception(f"PDF generation error: {str(e)}")
     
     async def _generate_png(self, html_content: str) -> Optional[str]:

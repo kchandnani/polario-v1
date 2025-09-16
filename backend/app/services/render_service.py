@@ -32,10 +32,13 @@ class RenderService:
         
         # HTMLCSStoImage API configuration
         self.api_base = "https://hcti.io/v1"
-        # For testing, we'll use demo credentials (limited but free)
-        # In production, you'd get your own API key from htmlcsstoimage.com
-        self.api_user = "demo"  # Replace with your user_id
-        self.api_key = "demo"   # Replace with your api_key
+        
+        # Get API credentials from environment variables
+        self.api_user = os.getenv("HTMLCSSTOIMAGE_USER_ID")
+        self.api_key = os.getenv("HTMLCSSTOIMAGE_API_KEY")
+        
+        if not self.api_user or not self.api_key:
+            raise ValueError("HTMLCSSTOIMAGE_USER_ID and HTMLCSSTOIMAGE_API_KEY environment variables are required")
         
     async def generate_brochure(self, request: RenderRequest) -> RenderResponse:
         """

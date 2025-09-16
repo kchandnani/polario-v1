@@ -161,6 +161,7 @@ class AIService:
         - Subheadline: Clarifies value prop, addresses main pain point (≤140 characters)  
         - 3 Feature Bullets: Transform features into customer benefits with specifics
         - CTA: Action-oriented with urgency/value proposition
+        - Palette: Choose from professional options based on industry/tone
 
         COPYWRITING BEST PRACTICES:
         - Use power words that resonate with the target audience
@@ -177,6 +178,14 @@ class AIService:
         - Bullet descriptions: ≤120 characters each
         - CTA label: ≤25 characters
         - CTA sub: ≤50 characters (optional)
+        
+        PALETTE OPTIONS (choose one based on business type/tone):
+        - "classic_graphite": Professional, corporate (steel/copper)
+        - "polished_nickel": Modern, tech-focused (nickel/warm metal)
+        - "slate_copper": Bold, confident brands (dark slate/copper)
+        - "soft_tungsten": Luxury, premium (tungsten/brown)
+        - "charcoal_bronze": High contrast, bold (charcoal/bronze)
+        - "pewter_gold": Classic, traditional (pewter/gold)
         
         STYLE ANALYSIS:
         Analyze the business and suggest design preferences:
@@ -208,11 +217,7 @@ class AIService:
                 "label": "Action-oriented CTA",
                 "sub": "Urgency/value element"
             }},
-            "style_hints": {{
-                "tone": "professional|minimal|bold",
-                "variant_bias": "copper|steel|nickel|tungsten|charcoal|pewter", 
-                "layout_bias": "hero-left|hero-right|hero-full"
-            }}
+            "palette": "classic_graphite"
         }}
         
         Example for accounting software:

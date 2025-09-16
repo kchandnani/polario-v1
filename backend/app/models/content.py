@@ -41,7 +41,7 @@ class CopyData(BaseModel):
     subheadline: Optional[str] = Field(None, max_length=140, description="Sub-headline")
     bullets: List[BulletPoint] = Field(..., min_items=3, max_items=3, description="Exactly 3 bullet points")
     cta: Optional[CallToAction] = Field(None, description="Call to action")
-    style_hints: Optional[StyleHints] = Field(None, description="Style preferences for variant selection")
+    palette: Optional[str] = Field(None, description="Selected palette: classic_graphite|polished_nickel|slate_copper|soft_tungsten|charcoal_bronze|pewter_gold")
 
 class ContentResponse(BaseModel):
     """Response from AI content generation"""

@@ -91,13 +91,13 @@ class RenderService:
             template_name = request.template + ".html"
             template = self.jinja_env.get_template(template_name)
             
-            # Generate variant configuration based on project and style hints
+            # Generate variant configuration based on project and palette preference
             copy_dict = request.copy_data.dict()
-            style_hints = copy_dict.get("style_hints", {}) if copy_dict.get("style_hints") else None
+            palette_preference = copy_dict.get("palette")
             
             variant_config = VariantSystem.generate_variant_config(
                 project_id=request.project_id,
-                style_hints=style_hints
+                palette_preference=palette_preference
             )
             
             # Generate dynamic CSS with variant configuration

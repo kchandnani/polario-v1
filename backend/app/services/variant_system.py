@@ -177,31 +177,14 @@ class VariantSystem:
         return int.from_bytes(hash_bytes[:4], byteorder='big')
     
     @classmethod
-    def select_variant(cls, seed: int, style_hints: Optional[Dict[str, str]] = None) -> VariantSet:
-        """Select variant set based on seed and optional style hints"""
+    def select_variant(cls, seed: int, palette_preference: Optional[str] = None) -> VariantSet:
+        """Select variant set based on seed and optional palette preference"""
         
-        if style_hints:
-            # Try to match style hints to preferred variants
-            variant_bias = style_hints.get("variantBias", "")
-            layout_bias = style_hints.get("layoutBias", "")
-            
-            # Filter variants based on hints
-            preferred_variants = []
+        if palette_preference:
+            # Try to find a variant that uses the preferred palette
             for variant in cls.VARIANT_SETS:
-                matches = 0
-                if variant_bias and variant_bias in variant.palette_pack:
-                    matches += 2
-                if layout_bias and layout_bias == variant.hero_layout:
-                    matches += 2
-                if matches > 0:
-                    preferred_variants.append((variant, matches))
-            
-            if preferred_variants:
-                # Sort by match score and pick from top matches
-                preferred_variants.sort(key=lambda x: x[1], reverse=True)
-                best_matches = [v for v, score in preferred_variants if score == preferred_variants[0][1]]
-                variant_index = seed % len(best_matches)
-                return best_matches[variant_index]
+                if variant.palette_pack == palette_preference:
+                    return variant
         
         # Default: deterministic selection based on seed
         variant_index = seed % len(cls.VARIANT_SETS)
@@ -214,14 +197,14 @@ class VariantSystem:
     
     @classmethod
     def generate_variant_config(cls, project_id: str, user_id: str = "", 
-                              created_at: str = "", style_hints: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+                              created_at: str = "", palette_preference: Optional[str] = None) -> Dict[str, Any]:
         """Generate complete variant configuration for a project"""
         
         # Generate deterministic seed
         seed = cls.generate_seed(project_id, user_id, created_at)
         
         # Select variant set
-        variant = cls.select_variant(seed, style_hints)
+        variant = cls.select_variant(seed, palette_preference)
         
         # Get palette
         palette = cls.get_palette(variant.palette_pack)
